@@ -1,18 +1,23 @@
-# @aidomx/core
+# Aidomx Core
 
-**Versi stabil awal: `0.0.5`**
+[![npm version](https://img.shields.io/npm/v/@aidomx/core?color=blue&label=npm)](https://www.npmjs.com/package/@aidomx/core)
+[![license](https://img.shields.io/npm/l/@aidomx/core?cacheSeconds=60)](LICENSE)
+[![Build status](https://github.com/aidomx/core/actions/workflows/ci.yml/badge.svg)](#)
+[![NPM Downloads](https://img.shields.io/npm/dw/%40aidomx%2Fcore)](#)
 
-`@aidomx/core` adalah inti dari ekosistem **AIDOMX** — sebuah pendekatan baru untuk membuat UI yang bersih, deklaratif, dan fleksibel. Package ini menjadi tempat utama untuk mendefinisikan *rules*, *bindings*, dan logika yang dapat diintegrasikan ke berbagai platform seperti React, Vue, HTML biasa, atau bahkan server.
+**Modular, reactive, identity-driven UI logic core**
+
+**Aidomx Core** adalah inti dari sistem Aidomx, berfokus pada manipulasi elemen virtual, komposisi logika komponen, serta pengelolaan struktur UI berbasis identitas — tanpa tergantung framework UI seperti React atau Vue.
 
 ---
 
 ## Fitur Utama
 
-- Deklaratif dengan sintaks `v-ai="..."` untuk pengikatan logika ke elemen UI.
-- Menyederhanakan `useState`, `useEffect`, dan handler lainnya di React.
-- Mendukung berbagai environment: HTML, React, dan ke depannya Vue & Server.
-- Kompatibel dengan `rupalang` sebagai DSL opsional untuk konfigurasi yang lebih ekspresif.
-- Fleksibel: bebas digunakan secara ringan atau ketat tergantung mode (strict vs loose).
+- Definisi aturan UI berbasis `rules` yang ringan dan eksplisit
+- Sistem `ghost` dan `virtual` untuk pengelolaan elemen virtual secara efisien
+- Manipulasi dinamis melalui `createStore` dan `createVirtual`
+- Dukungan `scope`, `group`, dan `routes` sebagai struktur UI kontekstual
+- Tidak bergantung pada React — dapat diintegrasikan ke berbagai renderer
 
 ---
 
@@ -22,120 +27,134 @@
 npm install @aidomx/core
 ```
 
-Jika digunakan secara lokal (sebelum publish ke npm):
-
-```bash
-npm install ../aidomx/core
-```
-
 ---
 
-## Konsep Dasar
-
-### 1. Pengikatan via `v-ai`
-
-```html
-<!-- HTML -->
-<div v-ai="navbar"></div>
-```
-
-```tsx
-// React (tanpa useState atau useEffect!)
-return (
-  <div v-ai="navbar">
-    <div v-ai="section left"></div>
-    <div v-ai="section right"></div>
-  </div>
-)
-```
-
-### 2. Konfigurasi Rule
+# Contoh Penggunaan
 
 ```ts
-const rules = {
-  components: [
+import { createVirtual, defineRules } from '@aidomx/core'
+
+const rules = defineRules({
+  root: 'container',
+  components: [],
+  routes: {
+    '/': [],
+  },
+  debug: true,
+})
+
+const vr = createVirtual(rules)
+
+vr.createGhost({
+  entries: [
     {
-      name: "navbar",
-      className: "bg-transparent",
-      onScroll(e) {
-        this.className = e.height >= 300 ? "bg-blue-500" : "bg-transparent"
+      name: 'brand',
+      design: {
+        type: 'h1',
+        content: 'Aidomx',
       },
-      onState(prev) {
-        // React to state changes
-      }
+    },
+    {
+      name: 'products',
+      design: { type: 'div' },
+    },
+    {
+      name: 'button',
+      design: { type: 'button' },
+    },
+  ],
+  autoCompile: true,
+})
+
+vr.connect((rupa) => {
+  rupa('products', async (ctx) => {
+    await ctx.add([{ name: 'kaos pendek' }, { name: 'kaos panjang' }])
+  })
+})
+
+vr.spawnGhosts('buttonGroups', {
+  count: 5,
+  design: { type: 'button' },
+  randomId: false,
+  contents: ['one', 'two', 'three', 'four', 'five'],
+  map(ghost, index) {
+    return {
+      ...ghost,
+      design: {
+        ...ghost.design,
+        className: index === 0 ? 'btn-blue-500' : 'btn-green-500',
+      },
     }
-  ]
-}
+  },
+})
+
+vr.cloneGhost('products')
+vr.sortGhost({
+  from: 'products',
+  to: 'brand',
+})
+
+vr.pushGhost()
+const ghost = vr.pullGhost()
+console.log(ghost)
 ```
 
 ---
 
-## Dukungan Platform
+# API Utama
 
-| Platform | Status        |
-|----------|---------------|
-| HTML     | Coming soon   |
-| React    | Rilis awal    |
-| Vue      | Coming soon   |
-| Vite     | Coming soon   |
-| Server   | Dalam riset   |
-| Rupalang | Eksperimental |
+## defineRules
 
----
-
-## Rupalang (Opsional)
-
-Jika Anda menyukai deklarasi seperti CSS:
+Mendefinisikan struktur awal komponen dan rute.
 
 ```ts
-navbar {
-  class: "bg-transparent"
-
-  onScroll(e) => {
-    class = e.height >= 300 ? "bg-blue-500" : "bg-transparent"
-  }
-}
+defineRules({
+  root: 'container',
+  components: [],
+  routes: { '/': [] },
+})
 ```
 
----
+## createVirtual
 
-## Strict Mode
+Menciptakan virtual environment yang dapat dimodifikasi tanpa mengubah rules asli secara langsung.
 
-Aktifkan `strictMode: true` untuk validasi type di deklarasi komponen seperti:
+## createGhost
 
-```rpl
-Navbar<class> {}
-```
+Menambahkan elemen virtual secara dinamis berdasarkan konfigurasi.
 
-Mode ini bersifat opsional dan ditujukan untuk proyek besar atau production.
+## connect
 
----
+Menghubungkan nama elemen dengan fungsi manipulasi data berbasis identitas (ctx).
 
-## Roadmap
+## spawnGhosts
 
-- [x] Versi dasar HTML dan React
-- [ ] Parser runtime untuk konfigurasi terpisah
-- [ ] Komunikasi antar komponen
-- [ ] Integrasi penuh dengan `@aidomx/server`
-- [ ] CLI Tools untuk scaffolding dan validasi
-- [ ] Dukungan dokumentasi otomatis (rpl-docgen)
+Membuat banyak elemen virtual sekaligus berdasarkan count dan contents.
+
+## sortGhost
+
+Mengatur ulang posisi antar elemen berdasarkan identitas (from, to).
 
 ---
 
-## Lisensi
+# Roadmap
 
-MIT
+[x] Rilis awal @aidomx/core
+
+[x] Dukungan createStore, createVirtual, connect
+
+[x] Fungsi spawnGhosts, cloneGhost, sortGhost
+
+[ ] Plugin renderer (React, Vue, Solid) sebagai package terpisah
+
+[ ] Dokumentasi lanjutan dan test coverage
 
 ---
 
-## Kontribusi
+# Lisensi
 
-Aidomx adalah proyek terbuka dan sangat menerima kontribusi. Jangan ragu untuk membuat PR, diskusi, atau issue.
+MIT © 2025 @aidomx
 
 ---
 
-## Catatan
-
-AIDOMX lahir dari kebutuhan untuk menyederhanakan UI dan logika dalam satu sistem yang fleksibel namun tetap scalable.
-
-
+> Aidomx dikembangkan untuk memberikan struktur yang terpisah antara logika dan UI, membantu developer membangun antarmuka kompleks tanpa boilerplate yang berat.
