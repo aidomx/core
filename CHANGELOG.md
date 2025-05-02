@@ -14,7 +14,23 @@ All significant changes to this project will be documented here.
 
 ---
 
-## [0.1.0] - Upcoming
+## [0.1.1] - 3 May, 2025
+
+### Removed
+
+- Deprecated `rules.routes` and `rules.debug` have been fully removed.
+- Removed utilities: `normalizeRules.ts`, `resolvedPath.ts`, and `shallowEqual.ts` as they are no longer relevant.
+
+### Changed
+
+- Simplified rule handling logic, now fully scoped to `createVirtual` and component rendering.
+- Updated internal typings to reflect removal of routes/debug.
+
+### Notes
+
+- System is now more predictable and minimal, focusing only on virtual-driven rendering.
+
+## [0.1.0] - 2 May, 2025
 
 ### Added
 

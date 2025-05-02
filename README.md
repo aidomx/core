@@ -37,10 +37,6 @@ import { createVirtual, defineRules } from '@aidomx/core'
 const rules = defineRules({
   root: 'container',
   components: [],
-  routes: {
-    '/': [],
-  },
-  debug: true,
 })
 
 const vr = createVirtual(rules)
@@ -145,7 +141,7 @@ Mengatur ulang posisi antar elemen berdasarkan identitas (from, to).
 
 [x] Fungsi spawnGhosts, cloneGhost, sortGhost
 
-[ ] Plugin renderer (React, Vue, Solid) sebagai package terpisah
+[ ] Intregasi vanilla, vite, vue, etc
 
 [ ] Dokumentasi lanjutan dan test coverage
 

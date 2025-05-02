@@ -1,11 +1,11 @@
-import type { CacheRules, DataStore, RuleComponent } from '@/types'
+import type { DbStore, RuleComponent, RulesConfig } from '@/types'
 
 /**
  * rulesMap
  *
  * Digunakan untuk memperbarui seluruh rules.
  */
-export const rulesMap = new Map<string, CacheRules | any>()
+export const rulesMap = new Map<string, RulesConfig | any>()
 
 /**
  * ghostMap
@@ -19,4 +19,4 @@ export const ghostMap = new Map<string, RuleComponent[]>()
  *
  * Spesifik untuk memperbarui rules.data
  */
-export const storeMap = new Map<string, DataStore[]>()
+export const storeMap = new Map<string, DbStore[]>()

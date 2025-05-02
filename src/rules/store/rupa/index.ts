@@ -1,5 +1,5 @@
 import { CACHE_KEY_RULES } from '@/constants/cacheKey'
-import { logWarning, resolvedPath } from '@/utils'
+import { logWarning } from '@/utils'
 import type { RulesConfig, RupaCallback, RupaStore } from '@/types'
 import { rupaActions } from './actions'
 import { rulesMap } from '@/_caches'
@@ -50,7 +50,7 @@ class Rupa {
    * Initialize and execute callback if validation passed.
    */
   private async initialize() {
-    this.guardPathAccess()
+    // this.guardPathAccess()
 
     const rupaStore: RupaStore = rupaActions(this.path, this.rules)
     return await this.callback(rupaStore)
@@ -59,12 +59,12 @@ class Rupa {
   /**
    * Guard access by path.
    */
-  private guardPathAccess() {
-    const isAllowed = resolvedPath(this.path, this.rules)
-    if (!isAllowed) {
-      throw new Error(`Access to '${this.path}' is not allowed on this route.`)
-    }
-  }
+  //private guardPathAccess() {
+  //const isAllowed = resolvedPath(this.path, this.rules)
+  //if (!isAllowed) {
+  //throw new Error(`Access to '${this.path}' is not allowed on this route.`)
+  //}
+  //}
 
   /**
    * Validate the loaded rules.

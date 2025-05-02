@@ -17,15 +17,15 @@ export type Base = {
   root: string | string[]
 
   /** Routes */
-  routes?:
-    | Record<string, string[]>
-    | {
-        pathname: string
-        name: string[]
-      }[]
+  //routes?:
+  //| Record<string, string[]>
+  //| {
+  //pathname: string
+  //name: string[]
+  //}[]
 
   /** Mode development */
-  debug?: false | true
+  //debug?: false | true
   skeleton?: Skeleton
   colorScheme?: 'default' | 'light' | 'dark'
   __aidomx__?: string
