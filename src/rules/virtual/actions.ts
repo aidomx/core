@@ -2,7 +2,6 @@ import { ghostMap, rulesMap } from '@/_caches'
 import { ghostElements } from '@/_maps'
 import { CACHE_KEY_RULES, GHOST_KEY_RULES } from '@/constants/cacheKey'
 import { getGhostId } from '@/constants/ghostId'
-import { encodeData } from '@/security'
 import type {
   CreateGhostLayer,
   RemoveLayer,
@@ -27,12 +26,12 @@ import type {
   PullGhostLayer,
   IsGhostReadyLayer,
 } from '@/types'
-import { deepClone, generateId, logWarning } from '@/utils'
+import { clonePreserve, deepClone, generateId, logWarning } from '@/utils'
 import { createStore } from '../store'
 
 export const ActionsVirtual = (rules: RulesConfig): VirtualApi => {
   // @encrypted
-  const encrypted = encodeData(rules)
+  // const encrypted = encodeData(rules)
 
   let isGhostReady: IsGhostReadyLayer = rulesMap.has(CACHE_KEY_RULES)
 
@@ -131,8 +130,7 @@ export const ActionsVirtual = (rules: RulesConfig): VirtualApi => {
       return
     }
 
-    const cloned = deepClone(ghost)
-    const rules_ = rules.debug ? rules : encrypted
+    const cloned = clonePreserve(ghost)
 
     if (rules?.components) {
       rules.components.push(cloned)
@@ -140,7 +138,7 @@ export const ActionsVirtual = (rules: RulesConfig): VirtualApi => {
 
     ghostMap.set(getGhostId(ghost.name), [ghost])
     ghostMap.set(GHOST_KEY_RULES, rules.components ?? [])
-    rulesMap.set(CACHE_KEY_RULES, rules_)
+    rulesMap.set(CACHE_KEY_RULES, rules)
   }
 
   // @cloneGhost
@@ -279,7 +277,7 @@ export const ActionsVirtual = (rules: RulesConfig): VirtualApi => {
         rules.components = currentGhost
 
         ghostMap.set(GHOST_KEY_RULES, currentGhost)
-        rulesMap.set(CACHE_KEY_RULES, rules.debug ? rules : encrypted)
+        rulesMap.set(CACHE_KEY_RULES, rules)
 
         return true
       }
@@ -300,7 +298,7 @@ export const ActionsVirtual = (rules: RulesConfig): VirtualApi => {
 
     rules.components = []
 
-    rulesMap.set(CACHE_KEY_RULES, rules.debug ? rules : encrypted)
+    rulesMap.set(CACHE_KEY_RULES, rules)
 
     return true
   }
@@ -344,19 +342,23 @@ export const ActionsVirtual = (rules: RulesConfig): VirtualApi => {
       return {}
     }
 
-    const ghost = getContainerGhost()
+    if (rules?.components) {
+      return groupByName(rules.components)
+    }
 
-    return groupByName(ghost)
+    return {}
   }
 
   const groupByName = (ghosts: GhostElement[]) => {
-    const result: Record<string, GhostElement> = {}
+    let result: Record<string, GhostElement> = {}
 
-    for (const item of ghosts) {
-      if (item?.name) {
-        result[item.name] = item
+    ghosts.forEach((ghost) => {
+      if (ghost.name) {
+        result[ghost.name] = ghost
       }
-    }
+
+      return result
+    })
 
     return result
   }

@@ -4,7 +4,6 @@ import { encodeData } from '@/security'
 import type {
   AddStore,
   RulesConfig,
-  DataStore,
   DbProps,
   GetStore,
   GetStoreProps,
@@ -15,7 +14,7 @@ import type {
   DataObject,
   DbStore,
 } from '@/types'
-import { deepClone, logWarning } from '@/utils'
+import { logWarning } from '@/utils'
 
 /**
  * Membuat kumpulan fungsi aksi untuk mengelola data store berdasarkan pathId dan rules yang diberikan.
@@ -52,6 +51,8 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
   /**
    * Syncs the current storeMap data into rulesMap and the component definition.
    * Skips if the component is not found.
+   *
+   * @setRulesMap
    */
   const setRulesMap = async () => {
     const component = rules.components?.find((c) => c.name === pathId)
@@ -61,12 +62,10 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
     }
 
     if (!Array.isArray(component.data)) {
-      component.data = []
+      component.data = getStoreMap()
     }
 
-    const cloned = getStoreMap()
-    const rules_ = rules.debug ? rules : encodeData(cloned)
-    cloned.map((item) => component.data?.push(deepClone(item)))
+    const rules_ = rules.debug ? rules : encodeData(component.data)
     // component.data.push(cloned)
     rulesMap.set(CACHE_KEY_RULES, rules_)
   }
@@ -93,7 +92,7 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @param {DataStore[]} lastModified - The array of updated data.
    * @returns DataStore[] The same updated data after persistence.
    */
-  const next = async (lastModified: DataStore) => {
+  const next = async (lastModified: DbStore) => {
     if (!Array.isArray(lastModified)) {
       logWarning('next() expects an array of data')
       return []
@@ -105,44 +104,43 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
     return lastModified
   }
 
+  const normalizeToArray = <T>(data: T | T[]): T[] =>
+    Array.isArray(data) ? data : [data]
+
   /**
    * Menambahkan data baru ke komponen tertentu.
    * Secara otomatis menambahkan ID berdasarkan urutan data terakhir.
    *
    * @param data - Objek data yang akan ditambahkan.
    */
-  const add: AddStore = async (data: DataStore) => {
+  const add: AddStore = async (data: DbStore): Promise<DbStore> => {
     try {
       const store = before()
 
-      if (!Array.isArray(data)) {
-        return logWarning('Data must be an array when using ctx.add')
-      }
+      const normalized = normalizeToArray(data)
 
       const prevId = store?.length ?? 0
-      const newData = data.map((item, index) => {
-        let nextId = `${pathId}.${prevId + index + 1}`
-
+      const newData = normalized.map((item, index) => {
+        const nextId = `${pathId}.${prevId + index + 1}`
         return {
           id: nextId,
           ...item,
         }
       })
 
-      // Cek dan filter duplikat berdasarkan id
       const filteredData = newData.filter((item) => {
-        return !store.some((oldData: any) => {
-          return oldData.id === item.id
-        })
+        return !store.some((oldData: any) => oldData.id === item.id)
       })
 
       if (filteredData.length === 0) {
-        return logWarning(`No new data added; all entries already exist.`)
+        logWarning(`No new data added; all entries already exist.`)
+        return []
       }
 
       return await next(filteredData)
     } catch (e) {
-      return logWarning(`Failed add data with error : ${(e as Error).message}`)
+      logWarning(`Failed add data with error : ${(e as Error).message}`)
+      return []
     }
   }
   /**
@@ -151,12 +149,12 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @param props.select - Objek dengan nama properti sebagai kunci dan boolean sebagai penanda apakah properti tersebut diambil.
    * @returns Data yang difilter sesuai properti yang dipilih atau seluruh rules jika tidak ada `select`.
    */
-  const get: GetStore = async (options?: GetStoreProps) => {
+  const get: GetStore = async (options?: GetStoreProps): Promise<DbStore> => {
     try {
       const store = before()
 
       if (!options?.select || Object.keys(options?.select).length === 0) {
-        return getStoreMap() as DataStore
+        return getStoreMap() as DbStore
       }
 
       const currentData = Array.isArray(store) ? store : []
@@ -177,6 +175,7 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
       return selected
     } catch (e) {
       logWarning(`Error getting rules: ${(e as Error).message}`)
+      return []
     }
   }
 
@@ -187,16 +186,20 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @param cb - Fungsi callback untuk memodifikasi data sebelumnya.
    * @returns Promise yang menyelesaikan proses update.
    */
-  const update: UpdateStore = async (id: string, cb: UpdateStoreProps) => {
+  const update: UpdateStore = async (
+    id: string,
+    cb: UpdateStoreProps
+  ): Promise<DbStore> => {
     try {
       const store = before()
-      const currentData = Array.isArray(store) ? [...store] : []
+      const currentData = Array.isArray(store) ? store : []
       const currentIndex = currentData.findIndex(
         (item: DbStore) => item.id === id
       )
 
       if (currentIndex === -1) {
-        return logWarning(`No data found to update in component ${pathId}.`)
+        logWarning(`No data found to update in component ${pathId}.`)
+        return []
       }
 
       const prev = currentData[currentIndex]
@@ -209,7 +212,8 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
 
       return await next(currentData)
     } catch (e) {
-      return logWarning(`Update failed with error: ${(e as Error).message}`)
+      logWarning(`Update failed with error: ${(e as Error).message}`)
+      return []
     }
   }
 
@@ -220,7 +224,7 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @param id - ID data yang ingin dihapus.
    * @returns Promise yang menyelesaikan proses penghapusan.
    */
-  const remove: RemoveStore = async (id: string) => {
+  const remove: RemoveStore = async (id: string): Promise<DbStore> => {
     try {
       const store = before()
       const currentData = Array.isArray(store) ? [...store] : []
@@ -238,7 +242,8 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
 
       return await next(resetId)
     } catch (e) {
-      return logWarning(`Remove item failed because ${(e as Error).message}`)
+      logWarning(`Remove item failed because ${(e as Error).message}`)
+      return []
     }
   }
 
@@ -247,7 +252,7 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    *
    * @returns Promise yang menyelesaikan proses reset.
    */
-  const reset: ResetStore = async () => {
+  const reset: ResetStore = async (): Promise<DbStore> => {
     try {
       const store = before()
       if (Array.isArray(store)) {
@@ -258,7 +263,8 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
 
       return store
     } catch (e) {
-      return logWarning(`Reset failed with error: ${(e as Error).message}`)
+      logWarning(`Reset failed with error: ${(e as Error).message}`)
+      return []
     }
   }
 

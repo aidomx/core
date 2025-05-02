@@ -46,10 +46,12 @@ const validateRules = (rules: Rules): boolean => {
     return false
   }
 
-  const cacheRules = rulesMap.get(CACHE_KEY_RULES)
+  const cached = rulesMap.get(CACHE_KEY_RULES)
 
-  if (!cacheRules || cacheRules.__aidomx__ !== rules.__aidomx__) {
-    logWarning('Provided rules do not match the cached rules.')
+  if (!cached || cached.__aidomx__ !== rules.__aidomx__) {
+    logWarning(
+      '[Virtual@validateRules] Provided rules do not match the cached rules.'
+    )
     return false
   }
 

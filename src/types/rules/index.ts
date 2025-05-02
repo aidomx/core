@@ -27,6 +27,8 @@ export type Base = {
   /** Mode development */
   debug?: false | true
   skeleton?: Skeleton
+  colorScheme?: 'default' | 'light' | 'dark'
+  __aidomx__?: string
 }
 
 /**
@@ -36,21 +38,12 @@ export type Base = {
  *
  * @type object
  */
-export type Rules = DeepReadonly<Base & RuleComponent>
+export type Rules = DeepReadonly<Base>
 
 /**
  * Rules based cache
  *
- * Digunakan untuk kebetuhan membaca dan menulis pada rules.
- *
- * @type object
- */
-export type CacheRules = Base & RuleComponent
-
-/**
- * Rules based cache
- *
- * Digunakan untuk kebetuhan membaca dan menulis pada rules.
+ * Digunakan untuk kebutuhan membaca dan menulis pada rules.
  *
  * @type object
  */

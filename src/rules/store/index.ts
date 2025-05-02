@@ -65,7 +65,9 @@ const validateRules = (rules: Rules): boolean => {
   const cached = rulesMap.get(CACHE_KEY_RULES)
 
   if (!cached || cached.__aidomx__ !== rules.__aidomx__) {
-    logWarning('Provided rules do not match the cached rules.')
+    logWarning(
+      '[Store@validateRules] Provided rules do not match the cached rules.'
+    )
     return false
   }
 

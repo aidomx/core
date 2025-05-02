@@ -1,5 +1,4 @@
-import type { DataBounds, Filters, Skeleton } from '../shared'
-import { DataStore } from '../store'
+import { DbStore } from '../store'
 import { ComponentVariant } from './variant'
 import { HTMLElementType } from './type'
 
@@ -46,11 +45,11 @@ export type Design = {
   content?: string
 }
 
-export type Listeners = Record<string, (e: any) => void>
+export type Listeners = { [key: string]: <T>(events: T) => void | T }
 
 export type RuleComponent = {
   name?: string
-  data?: DataStore[]
+  data?: DbStore[]
   design?: Design
   listeners?: Listeners
   scope?: RuleComponent[]

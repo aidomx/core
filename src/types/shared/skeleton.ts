@@ -5,24 +5,14 @@
  */
 export type Skeleton = {
   /** ClassName CSS custom untuk skeleton */
-  // className?: string
-
-  /** Aktifkan skeleton UI */
-  // enable: boolean
+  className?: string
 
   /** Nama skeleton component (optional) */
-  // name?: string
+  name?: string
 
   /** Inline style untuk skeleton */
-  // style?: Record<string, any>
-  select: SkeletonSelect
-  delay: {
-    start: number
-    end: number
-  }
-}
-
-export type SkeletonSelect = {
-  name: string
-  status: boolean
+  style?: Record<string, any>
+  status: false | true
+  delay: number
+  content?: string
 }

@@ -1,6 +1,6 @@
-import type { DataStore } from '@/types'
+import type { RulesConfig } from '@/types'
 
-export function encodeData(data: DataStore) {
+export function encodeData(data: RulesConfig) {
   try {
     const json = JSON.stringify(data)
     return btoa(encodeURIComponent(json))

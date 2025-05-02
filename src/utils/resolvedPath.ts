@@ -1,4 +1,4 @@
-import type { CacheRules } from '@/types'
+import type { Rules } from '@/types'
 import { normalizeRules } from './normalizeRules'
 
 /**
@@ -10,7 +10,7 @@ import { normalizeRules } from './normalizeRules'
  * @param rules - The rules configuration to evaluate against.
  * @returns True if the component is allowed to render, false otherwise.
  */
-export const resolvedPath = (name: string, rules: CacheRules): boolean => {
+export const resolvedPath = (name: string, rules: Rules): boolean => {
   if (rules?.debug) return true
 
   if (typeof window !== 'undefined') {

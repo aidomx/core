@@ -26,31 +26,28 @@ export type GetStoreProps = {
 /**
  * Tipe untuk fungsi yang digunakan untuk menambah data ke store.
  */
-export type AddStore = (data: DataStore) => Promise<void | DataStore>
+export type AddStore = (data: DbStore) => Promise<DbStore>
 
 /**
  * Tipe untuk fungsi yang digunakan untuk mengambil data dari store.
  */
-export type GetStore = (props?: GetStoreProps) => Promise<DataStore | void>
+export type GetStore = (props?: GetStoreProps) => Promise<DbStore>
 
 /**
  * Tipe untuk fungsi yang digunakan untuk menghapus data dari store.
  */
 /// <reference="ActionStore">
-export type RemoveStore = (id: string) => Promise<DataStore | void>
+export type RemoveStore = (id: string) => Promise<DbStore>
 
 /**
  * Tipe untuk fungsi yang digunakan untuk memperbarui data yang ada dalam store.
  */
-export type UpdateStore = (
-  id: string,
-  cb: UpdateStoreProps
-) => Promise<DataStore | void>
+export type UpdateStore = (id: string, cb: UpdateStoreProps) => Promise<DbStore>
 
 /**
  * Tipe untuk fungsi yang digunakan untuk mereset store ke kondisi awal.
  */
-export type ResetStore = () => Promise<DataStore | void>
+export type ResetStore = () => Promise<DbStore>
 
 /**
  * Tipe untuk store yang berisi fungsi-fungsi dasar seperti add, get, update, remove, dan reset.

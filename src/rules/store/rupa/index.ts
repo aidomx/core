@@ -24,6 +24,7 @@ import { rulesMap } from '@/_caches'
  */
 class Rupa {
   private rules: RulesConfig = rulesMap.get(CACHE_KEY_RULES)
+
   private path: string
   private isRulesValid: boolean = false
   private callback: RupaCallback
@@ -85,8 +86,9 @@ class Rupa {
     }
 
     const hasComponent = this.rules.components.some((c) => c.name === this.path)
+
     if (!hasComponent) {
-      logWarning(`Component '${this.path}' not found.`)
+      logWarning(`[Rupa] Component '${this.path}' not found.`)
       return false
     }
 

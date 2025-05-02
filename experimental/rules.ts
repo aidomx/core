@@ -4,7 +4,7 @@ const rules = defineRules({
   root: 'container',
   components: [],
   routes: {
-    '/': [],
+    '/': ['products'],
   },
   debug: true,
 })
@@ -29,6 +29,9 @@ vr.createGhost({
       name: 'button',
       design: {
         type: 'button',
+      },
+      listeners: {
+        test: () => {},
       },
     },
   ],
@@ -76,10 +79,10 @@ vr.sortGhost({
 // const summon = vr.summonGhost('products')
 // const remove = vr.removeGhost('products')
 // vr.resetGhost()
-vr.pushGhost()
+// vr.pushGhost()
 
 const ghost = vr.pullGhost()
+// console.log(JSON.stringify(ghost, null, 2))
 
+// console.log(ghost)
 // console.log(JSON.stringify(spawn, null, 2))
-
-console.log(ghost)
