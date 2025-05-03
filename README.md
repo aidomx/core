@@ -107,7 +107,6 @@ Mendefinisikan struktur awal komponen dan rute.
 defineRules({
   root: 'container',
   components: [],
-  routes: { '/': [] },
 })
 ```
 
