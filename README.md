@@ -29,106 +29,114 @@ npm install @aidomx/core
 
 ---
 
-# Contoh Penggunaan
+### Contoh Penggunaan
 
 ```ts
-import { createVirtual, defineRules } from '@aidomx/core'
+// TestHandler
+import type { RuleEvent } from '@aidomx/core'
 
-const rules = defineRules({
-  root: 'container',
-  components: [],
-})
+export const onClick = (event: RuleEvent) => {
+  alert('Hai Aidomx!!!')
+}
+```
 
-const vr = createVirtual(rules)
+```ts
+import { defineConfig } from '@aidomx/core'
 
-vr.createGhost({
-  entries: [
-    {
-      name: 'brand',
-      design: {
-        type: 'h1',
-        content: 'Aidomx',
-      },
+export const rules = defineConfig({
+  define: {
+    root: 'container',
+    components: { dashboard },
+    design: {
+      type: 'div',
+      className: 'p-4 w-full h-screen',
     },
-    {
-      name: 'products',
-      design: { type: 'div' },
+    skeleton: {
+      name: 'container',
+      className:
+        'flex flex-col gap-3 items-center justify-center h-[100vh] text-lg',
+      status: true,
+      delay: 150,
+      content: 'Preparing ghost components...',
     },
-    {
-      name: 'button',
-      design: { type: 'button' },
-    },
-  ],
-  autoCompile: true,
-})
-
-vr.connect((rupa) => {
-  rupa('products', async (ctx) => {
-    await ctx.add([{ name: 'kaos pendek' }, { name: 'kaos panjang' }])
-  })
-})
-
-vr.spawnGhosts('buttonGroups', {
-  count: 5,
-  design: { type: 'button' },
-  randomId: false,
-  contents: ['one', 'two', 'three', 'four', 'five'],
-  map(ghost, index) {
-    return {
-      ...ghost,
-      design: {
-        ...ghost.design,
-        className: index === 0 ? 'btn-blue-500' : 'btn-green-500',
-      },
-    }
   },
+  use: {
+    name: 'refreshButton',
+    maps: [TestHandler],
+  },
+  autoCompile: true,
+  devMode: false,
 })
-
-vr.cloneGhost('products')
-vr.sortGhost({
-  from: 'products',
-  to: 'brand',
-})
-
-vr.pushGhost()
-const ghost = vr.pullGhost()
-console.log(ghost)
 ```
 
----
+Sekarang hot reload tidak lagi menjadi masalah dalam sistem berbasis rules. Berikut penjelasan dari masing-masing opsi dalam `defineConfig`:
 
-# API Utama
+- **define**
+  Digunakan untuk mendefinisikan komponen. `root` dan `components` adalah properti wajib.
 
-## defineRules
+- **use**
+  Memberikan fleksibilitas untuk menambahkan event handler eksternal.
 
-Mendefinisikan struktur awal komponen dan rute.
+- **autoCompile**
+  Secara default bernilai `true`. Jika disetel ke `false`, kamu dapat melakukan perbaikan atau pengujian manual. Saat ini belum mendukung mode maintenance otomatis, tetapi bisa saja hadir di versi mendatang jika `autoCompile` = `false`.
+
+- **devMode**
+  Fitur yang sangat berguna untuk pengembang karena membuka akses penuh ke seluruh fitur `defineConfig`.
+
+- **clone**
+  Melakukan cloning terhadap komponen berdasarkan `id`, contoh: `clone: "title"`.
+
+- **spawn**
+  Membuat beberapa komponen secara dinamis. Contoh:
 
 ```ts
-defineRules({
-  root: 'container',
-  components: [],
-})
+spawn: {
+  id: "buttonGroups",
+  config: {
+    count: 5,
+    design: {
+      type: 'button',
+    },
+    randomId: false,
+    contents: ['one', 'two', 'three', 'four', 'five'],
+    map(el, index) {
+      return {
+        ...el,
+        design: {
+          ...el.design,
+          className: index === 0 ? 'btn-blue-500' : 'btn-green-500',
+        },
+      }
+    }
+  }
+}
 ```
 
-## createVirtual
+- **connect**
+  Setiap komponen memiliki `components[name].data`, yang bisa kamu kontrol melalui fungsi ini. Contoh:
 
-Menciptakan virtual environment yang dapat dimodifikasi tanpa mengubah rules asli secara langsung.
+```ts
+connect: (rupa) => {
+  rupa('test', async (db) => {
+    await db.add({ name: 'Alex' })
+  })
+},
+```
 
-## createGhost
+`connect` menggunakan format `rupa(id, callback)`, di mana `id` adalah nama komponen dan `callback` memberikan akses ke fungsi `add`, `update`, `remove`, `get`, dan `reset`.
 
-Menambahkan elemen virtual secara dinamis berdasarkan konfigurasi.
+- **remove**
+  Menghapus komponen tertentu berdasarkan namanya. Contoh: `remove: "test"`
 
-## connect
+- **sort**
+  Mengatur ulang urutan komponen. Contoh:
 
-Menghubungkan nama elemen dengan fungsi manipulasi data berbasis identitas (ctx).
-
-## spawnGhosts
-
-Membuat banyak elemen virtual sekaligus berdasarkan count dan contents.
-
-## sortGhost
-
-Mengatur ulang posisi antar elemen berdasarkan identitas (from, to).
+```ts
+sort: {
+  from: "title",
+  to: "description"
+}
+```
 
 ---
 

@@ -14,6 +14,39 @@ All significant changes to this project will be documented here.
 
 ---
 
+## [0.1.2] - May 8, 2025
+
+### Added
+
+- Added support for external event handlers via the `use` property in `defineConfig`.
+- Introduced new modular folders:
+  - `src/_events/` for defining and managing internal events.
+  - `src/rules/actions/` for rule-based logic actions.
+  - `src/rules/hooks/` for composing logic such as `useRules`.
+  - `src/rules/settings.ts` for dynamic rule management system.
+  - `src/_caches/getMap.ts` and `setMap.ts` for granular cache abstraction.
+
+### Changed
+
+- Major refactor: `defineRules` is now `defineConfig` to support more flexible rule configuration.
+- Removed and modularized `virtual/actions.ts` functionality.
+- Improved modularity and stability in `virtual/index.ts`.
+- Refactored and relocated types into clearer structures (`types/rules`, `types/events`, etc.).
+
+### Removed
+
+- `src/rules/virtual/actions.ts` has been removed and replaced with more modular handling.
+
+### Fixed
+
+- Stabilized the `rupa` system to support operations like `add`, `update`, `reset`, etc.
+- Adjusted dynamic ID handling in `ghostId.ts`.
+
+### Docs
+
+- Documentation updated to reflect the new API structure (`use`, `connect`, `spawn`, etc.).
+- Added `.env` setup example and configuration guide.
+
 ## [0.1.1] - 3 May, 2025
 
 ### Removed

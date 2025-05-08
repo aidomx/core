@@ -1,4 +1,4 @@
-import type { DbStore, RuleComponent, RulesConfig } from '@/types'
+import type { DbStore, RuleComponent, RuleEvent, RulesConfig } from '@/types'
 
 /**
  * rulesMap
@@ -13,6 +13,13 @@ export const rulesMap = new Map<string, RulesConfig | any>()
  * Spesifik untuk memperbarui rules.compnents
  */
 export const ghostMap = new Map<string, RuleComponent[]>()
+
+/**
+ * listenerMap
+ *
+ * Spesifik untuk menangani events
+ */
+export const listenerMap = new Map<string, (e?: RuleEvent) => void>()
 
 /**
  * storeMap

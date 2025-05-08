@@ -1,6 +1,5 @@
 import { rulesMap, storeMap } from '@/_caches'
-import { CACHE_KEY_RULES } from '@/constants/cacheKey'
-import { encodeData } from '@/security'
+import { CACHE_KEY_RULES, STORE_KEY_RULES } from '@/constants/cacheKey'
 import type {
   AddStore,
   RulesConfig,
@@ -26,11 +25,6 @@ import { logWarning } from '@/utils'
  */
 export const rupaActions = (pathId: string, rules: RulesConfig) => {
   /**
-   * Encoded store key based on pathId for isolation and mapping.
-   */
-  const encrypted = encodeData({ id: pathId })
-
-  /**
    * Ensures that the storeMap entry exists and returns its current state.
    * Throws error if rules are not available.
    *
@@ -41,8 +35,8 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
       throw new Error('No rules found in cache.')
     }
 
-    if (!storeMap.has(encrypted)) {
-      storeMap.set(encrypted, [])
+    if (!storeMap.has(STORE_KEY_RULES)) {
+      storeMap.set(STORE_KEY_RULES, [])
     }
 
     return getStoreMap()
@@ -65,9 +59,8 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
       component.data = getStoreMap()
     }
 
-    const rules_ = rules.debug ? rules : encodeData(component.data)
     // component.data.push(cloned)
-    rulesMap.set(CACHE_KEY_RULES, rules_)
+    rulesMap.set(CACHE_KEY_RULES, rules)
   }
 
   /**
@@ -76,10 +69,10 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @returns DataStore[] The array of current data.
    */
   const getStoreMap = () => {
-    const current = storeMap.get(encrypted)
+    const current = storeMap.get(STORE_KEY_RULES)
 
     if (!Array.isArray(current)) {
-      storeMap.set(encrypted, [])
+      storeMap.set(STORE_KEY_RULES, [])
       return []
     }
 
@@ -98,7 +91,7 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
       return []
     }
 
-    storeMap.set(encrypted, lastModified)
+    storeMap.set(STORE_KEY_RULES, lastModified)
     await setRulesMap()
 
     return lastModified

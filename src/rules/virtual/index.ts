@@ -1,13 +1,36 @@
-import { rulesMap } from '@/_caches'
+import { getRulesMap, rulesMap } from '@/_caches'
 import { CACHE_KEY_RULES } from '@/constants/cacheKey'
 import type { Rules, VirtualApi } from '@/types'
 import { logWarning } from '@/utils'
-import { ActionsVirtual } from './actions'
+import {
+  cloneGhost,
+  connect,
+  createGhost,
+  maintenance,
+  pullGhost,
+  pushGhost,
+  removeGhost,
+  resetGhost,
+  sortGhost,
+  spawnGhosts,
+  summonGhost,
+} from '../actions'
 
 const generateVirtual = (): VirtualApi => {
-  const cached = rulesMap.get(CACHE_KEY_RULES)
-
-  return { ...ActionsVirtual(cached) }
+  return {
+    createGhost,
+    connect,
+    cloneGhost,
+    //sealGhost,
+    summonGhost,
+    spawnGhosts,
+    maintenance,
+    removeGhost,
+    resetGhost,
+    pullGhost,
+    pushGhost,
+    sortGhost,
+  }
 }
 
 export const createVirtual = (
@@ -46,7 +69,7 @@ const validateRules = (rules: Rules): boolean => {
     return false
   }
 
-  const cached = rulesMap.get(CACHE_KEY_RULES)
+  const cached = getRulesMap()
 
   if (!cached || cached.__aidomx__ !== rules.__aidomx__) {
     logWarning(

@@ -1,5 +1,5 @@
 import type { DeepReadonly } from '../helpers/deepReadOnly'
-import type { RuleComponent } from '../components'
+import type { Design, RuleComponent } from '../components'
 import type { Skeleton } from '../shared'
 
 /**
@@ -9,12 +9,14 @@ import type { Skeleton } from '../shared'
  *
  * @type object
  */
-export type Base = {
+type Base = {
   /** Daftar komponen untuk dirender */
-  components?: RuleComponent[]
+  components?: RuleComponent | RuleComponent[]
 
   /** Selector root utama, contoh: #app atau body */
   root: string | string[]
+
+  design?: Design
 
   /** Routes */
   //routes?:
@@ -47,7 +49,6 @@ export type Rules = DeepReadonly<Base>
  *
  * @type object
  */
-
 export type RulesConfig = Base & RuleComponent
 
 export type * from './Api'

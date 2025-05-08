@@ -32,8 +32,6 @@ export type SpawnConfig = {
 
 export type CreateGhostLayer = (options: CreateGhostProps) => GhostElements
 
-export type IsGhostReadyLayer = false | true
-
 export type SpawnGhostsLayer = (
   id: string,
   config: SpawnConfig
@@ -41,7 +39,9 @@ export type SpawnGhostsLayer = (
 
 export type CompileLayer = (ghost: GhostElement) => void
 // @PullGhostLayer
-export type PullGhostLayer = () => Record<string, GhostElement>
+export type PullGhostLayer = (
+  scope: string[]
+) => Record<string, RuleComponent | RuleComponent[]>
 export type PushGhostLayer = () => RulesConfig
 
 export type SealGhostLayer = (id?: string) => void
@@ -52,7 +52,7 @@ export type ResetLayer = () => boolean
 
 export type CloneGhostLayer = (id: string) => GhostElement | void
 
-export type SummonGhostLayer = (id: string) => GhostElement[] | void
+export type SummonGhostLayer = (id: string) => GhostElement
 
 export type SortGhostLayer = (config: { from?: string; to?: string }) => void
 
@@ -61,6 +61,7 @@ export type ConnectGhostLayer = (
 ) => void
 
 export type MaintenanceLayer = boolean
+
 // ===============================
 // Virtual API
 // ===============================
@@ -70,7 +71,6 @@ export type VirtualApi = {
   createGhost: CreateGhostLayer
   connect: ConnectGhostLayer
   cloneGhost: CloneGhostLayer
-  isGhostReady: IsGhostReadyLayer
   //sealGhost: SealGhostLayer
   maintenance: MaintenanceLayer
   removeGhost: RemoveLayer
