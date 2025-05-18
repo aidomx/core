@@ -3,6 +3,7 @@ import { isArr, isWarn, logWarning } from '@/utils'
 import { defineRules } from './define'
 import { createVirtual } from './virtual'
 import { reactive } from './reactive'
+import { flow } from './flow'
 
 type Component = RulesApi.component
 type RulesConfig = RulesApi.rulesConfig
@@ -61,6 +62,10 @@ const createSetting: Settings = {
     if (use) reactive(use)
 
     return ready.has('created')
+  },
+
+  pull(): RulesConfig {
+    return flow.rules() as RulesConfig
   },
 }
 

@@ -28,6 +28,7 @@ export type Settings = {
   define: (state: Options) => boolean
   remove?: string
   reset?: true | false
+  pull?(): RulesConfig
   spawn?: Spawn
   // summon?: string
   sort?: { from: string; to: string }
