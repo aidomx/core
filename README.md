@@ -13,4 +13,4 @@
 
 ## Cara Penggunaan
 
-Agar lebih terstruktur, cara penggunaan kini tersedia di ![docs](https://github.com/aidomx/core/docs/README.md).
+Agar lebih terstruktur, cara penggunaan kini tersedia di ![docs](https://github.com/aidomx/core/blob/dev/docs%2FREADME.md).
