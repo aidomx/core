@@ -1,5 +1,6 @@
-import type { RulesApi } from '..'
+import type { LayerApi, RulesApi } from '..'
 
+type Component = RulesApi.component
 type RulesConfig = RulesApi.rulesConfig
 type Rupa = RulesApi.rupa
 type Spawn = RulesApi.spawn
@@ -22,16 +23,8 @@ export type Options = {
 }
 
 export type Settings = {
-  compile: (state?: RulesConfig) => void
-  clone?: string
-  connect?: (rupa: Rupa) => void
-  define: (state: Options) => boolean
-  remove?: string
-  reset?: true | false
-  pull?(): RulesConfig
-  spawn?: Spawn
-  // summon?: string
-  sort?: { from: string; to: string }
-  devMode?: true | false
-  use?: Use
+  compile?(state?: RulesConfig): void
+  define?(state: Options): boolean
+  push?(): RulesConfig
+  pull?(key: string[]): Record<string, Component | Component[]>
 }

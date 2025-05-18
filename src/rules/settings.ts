@@ -9,6 +9,7 @@ type Component = RulesApi.component
 type RulesConfig = RulesApi.rulesConfig
 type Settings = RulesApi.settings
 type Options = RulesApi.options
+type Pull = Record<string, Component | Component[]>
 
 let rules = {} as RulesConfig
 let virtual: VirtualApi = {} as VirtualApi
@@ -64,7 +65,11 @@ const createSetting: Settings = {
     return ready.has('created')
   },
 
-  pull(): RulesConfig {
+  pull(key: string[]): Pull {
+    return virtual.pullGhost(key) as Pull
+  },
+
+  push(): RulesConfig {
     return flow.rules() as RulesConfig
   },
 }
