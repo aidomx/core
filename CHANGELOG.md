@@ -14,6 +14,30 @@ All significant changes to this project will be documented here.
 
 ---
 
+## [0.1.6] - May 18, 2025
+
+### Added
+
+- Added `benchmark.ts` and `conditional.ts` in `utils` for logic and performance measurement purposes.
+- Added `reactive.ts` file for reactive state management.
+- Added `flow.ts` and `flowSchedule` systems to support modular and structured execution.
+- Added new modular structure support to `tasks/` and `config/`.
+- Added payload system for more structured validation and parsing.
+
+### Changed
+
+- Rewrote `defineConfig` to be more flexible and optimized.
+- Moved and tidied up `rulesKey`, removed obsolete keys like `ghostId`, `storeKey`, `cacheKey`.
+- Major refactor of `src/_caches/` structure, removing deprecated `Initializer.ts`, `setMap.ts` and `getMap.ts` files.
+- Optimized `rules/settings.ts`, `rules/store`, and `virtual/index.ts` to connect to each other more efficiently.
+- Simplified `secureRules` and `secureData`.
+- Major refactor of `types/rules`, moving types to modular directories (`types/tasks/`, `types/config/`).
+
+### Removed
+
+- Removed `useRules`, `hooks`, and related hooks files as they are no longer used after integration into `settings`.
+- Removed obsolete constants: `ghostId`, `storeKey`, `cacheKey`.
+
 ## [0.1.2] - May 8, 2025
 
 ### Added

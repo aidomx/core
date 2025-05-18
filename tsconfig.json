@@ -17,5 +17,5 @@
     }
   },
   "include": ["src", "experimental"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "vitest"]
 }

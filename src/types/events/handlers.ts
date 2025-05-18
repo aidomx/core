@@ -1,26 +1,36 @@
-import type { RuleComponent } from '../components'
+import type { EventMaps } from '@/_maps'
+import type { RulesApi } from '..'
 
-type HandlerFn = (event: RuleEvent) => void
-type HandlerMap = {
-  [event: string]: HandlerFn
-}
+export type EventType = EventMaps
+type HandlerFn<T extends RuleEvent = RuleEvent> = (e?: RuleEvent) => T | void
+export type HandlerMap<T extends HandlerFn = HandlerFn> = Record<EventType, T>
+type RuleComponent = RulesApi.component
+export type PickComponent = Pick<RuleComponent, 'id' | 'name' | 'design'>
 
-type HandlerMapFn = () => HandlerMap
+export type RuleEvent = {
+  pick(key: string): PickComponent
+  find(key: string): PickComponent
+  findAll(): PickComponent[]
+  create(key: string, value: PickComponent): void
+  read(key: string): Readonly<PickComponent>
+  update(key: string, value: PickComponent): void
+  delete(component: PickComponent, key: keyof PickComponent): boolean
+  reset(): boolean
+} & Event
 
-type _Event = Omit<Event, 'currentTarget'>
+export type ReactiveEvent<T extends Event = Event> = T & RuleEvent
 
-export type RuleEvent = _Event &
-  RuleComponent &
-  HTMLElement & {
-    get: (id: string) => RuleEvent
-    has: (cls: string) => boolean
-    add: (cls: string) => void
-    remove: (cls: string) => void
-    update: (cls: string[]) => void
-    reset: () => void
-  }
+export type EventSources =
+  | HandlerFn
+  | HandlerMap
+  | HandlerMap[]
+  | (() => HandlerFn)
+  | null
+  | undefined
 
 export type Use = {
-  name: string | string[]
-  maps?: HandlerMapFn | Array<HandlerFn | HandlerMap>
+  id?: string
+  name?: string
+  type?: keyof GlobalEventHandlersEventMap | string
+  maps?: EventSources
 }

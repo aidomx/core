@@ -1,14 +1,48 @@
-import { CACHE_KEY_RULES } from '@/constants/cacheKey'
-import { logWarning } from '@/utils'
-import type { RulesConfig, RupaCallback, RupaStore } from '@/types'
+import { isWarn } from '@/utils'
+import type { RulesApi } from '@/types'
 import { rupaActions } from './actions'
-import { rulesMap } from '@/_caches'
+import { findById, getRules } from '@/rules/actions'
+
+type RupaCallback = RulesApi.rupaCallback
+type RupaStore = RulesApi.rupaStore
+
+async function createConnection(name: string, cb: RupaCallback) {
+  const rupaStore: RupaStore = rupaActions(name, getRules())
+
+  return await cb(rupaStore)
+}
+
+/**
+ * Validate the loaded rules.
+ */
+const validateRules = (id: string): boolean => {
+  const rules = getRules()
+
+  if (!rules) {
+    isWarn('Rules not initialized. Please defineRules first.', rules)
+    return false
+  }
+
+  if (!rules.root || !rules.components) {
+    isWarn('Please, set your components rules.', rules)
+    return false
+  }
+
+  const component = findById(id)
+
+  if (!component) {
+    isWarn(`[Rupa] Component '${id}' not found.`, component)
+    return false
+  }
+
+  return true
+}
 
 /**
  * Memanipulasi komponen tertentu di dalam `rules.components`,
  * dengan memberikan akses ke context `RupaStore`.
  *
- * @param path - Nama komponen yang ingin dimanipulasi (harus sesuai dengan `component.name` di rules).
+ * @param name - Nama komponen yang ingin dimanipulasi (harus sesuai dengan `component.name` di rules).
  * @param callback - Fungsi async/sync yang menerima `ctx` sebagai context manipulasi.
  *
  * @example
@@ -22,79 +56,19 @@ import { rulesMap } from '@/_caches'
  *
  * @throws Console warning jika `rules` belum diinisialisasi atau `component` tidak ditemukan.
  */
-class Rupa {
-  private rules: RulesConfig = rulesMap.get(CACHE_KEY_RULES)
+export async function rupa(name: string, cb: RupaCallback) {
+  const valid = validateRules(name)
 
-  private path: string
-  private isRulesValid: boolean = false
-  private callback: RupaCallback
-
-  constructor(path: string, callback: RupaCallback) {
-    this.path = path
-    this.callback = callback
-    this.isRulesValid = this.validateRules()
-    if (this.isRulesValid) {
-      this.initialize()
-    }
+  if (!valid) {
+    isWarn('Failed connecting to rupa...', { valid })
+    return false
   }
 
-  /**
-   * Prepare for database connection.
-   */
-  public connect(env: any) {
-    console.log('Connecting to environment:', env)
-    return this
-  }
+  await createConnection(name, cb)
 
-  /**
-   * Initialize and execute callback if validation passed.
-   */
-  private async initialize() {
-    // this.guardPathAccess()
-
-    const rupaStore: RupaStore = rupaActions(this.path, this.rules)
-    return await this.callback(rupaStore)
-  }
-
-  /**
-   * Guard access by path.
-   */
-  //private guardPathAccess() {
-  //const isAllowed = resolvedPath(this.path, this.rules)
-  //if (!isAllowed) {
-  //throw new Error(`Access to '${this.path}' is not allowed on this route.`)
-  //}
-  //}
-
-  /**
-   * Validate the loaded rules.
-   */
-  private validateRules(): boolean {
-    if (!this.rules) {
-      logWarning('Rules not initialized. Please defineRules first.')
-      return false
-    }
-
-    if (!this.rules.root || !this.rules.components) {
-      logWarning('Please, set your components rules.')
-      return false
-    }
-
-    if (!this.rules?.components) {
-      logWarning('Ghost components not ready used.')
-      return false
-    }
-
-    const hasComponent = this.rules.components.some((c) => c.name === this.path)
-
-    if (!hasComponent) {
-      logWarning(`[Rupa] Component '${this.path}' not found.`)
-      return false
-    }
-
-    return true
+  return {
+    connect(_env: any) {
+      console.log('Connecting to database...')
+    },
   }
 }
-
-export const rupa = (componentId: string, cb: RupaCallback) =>
-  new Rupa(componentId, cb)

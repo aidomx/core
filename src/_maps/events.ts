@@ -110,4 +110,6 @@ export const eventMaps = [
   'onInputCapture',
   'onClickCapture',
   'onSubmitCapture',
-]
+] as const
+
+export type EventMaps = (typeof eventMaps)[number]

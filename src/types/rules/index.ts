@@ -50,5 +50,3 @@ export type Rules = DeepReadonly<Base>
  * @type object
  */
 export type RulesConfig = Base & RuleComponent
-
-export type * from './Api'

@@ -1,4 +1,5 @@
 export * from './clonePreserve'
+export * from './conditional'
 export * from './deepClone'
 export * from './generateId'
 export * from './logger'

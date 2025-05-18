@@ -1,8 +1,8 @@
-import { rulesMap, storeMap } from '@/_caches'
-import { CACHE_KEY_RULES, STORE_KEY_RULES } from '@/constants/cacheKey'
+import { tasks } from '@/_caches'
+import { getRules } from '@/rules/actions'
+import { getEqualComponent, getMerged } from '@/rules/reactive'
 import type {
   AddStore,
-  RulesConfig,
   DbProps,
   GetStore,
   GetStoreProps,
@@ -12,8 +12,11 @@ import type {
   UpdateStoreProps,
   DataObject,
   DbStore,
+  RulesApi,
 } from '@/types'
-import { logWarning } from '@/utils'
+import { is, isArr, isWarn, logWarning, toArr } from '@/utils'
+
+type RulesConfig = RulesApi.rulesConfig
 
 /**
  * Membuat kumpulan fungsi aksi untuk mengelola data store berdasarkan pathId dan rules yang diberikan.
@@ -35,11 +38,11 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
       throw new Error('No rules found in cache.')
     }
 
-    if (!storeMap.has(STORE_KEY_RULES)) {
-      storeMap.set(STORE_KEY_RULES, [])
+    if (!tasks.has('store')) {
+      tasks.create('store', [])
     }
 
-    return getStoreMap()
+    return tasks.read('store')
   }
 
   /**
@@ -49,18 +52,26 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @setRulesMap
    */
   const setRulesMap = async () => {
-    const component = rules.components?.find((c) => c.name === pathId)
+    const rules = getRules()
+    const components = getMerged()
+
+    if (!isArr(components)) return isWarn('Component is not found.', components)
+
+    const component = components.find((c) =>
+      getEqualComponent(c, pathId, pathId)
+    )
 
     if (!component) {
-      return logWarning(`Component with pathId ${pathId} not found.`)
+      return isWarn(`Component with pathId ${pathId} not found.`)
     }
 
     if (!Array.isArray(component.data)) {
       component.data = getStoreMap()
     }
 
-    // component.data.push(cloned)
-    rulesMap.set(CACHE_KEY_RULES, rules)
+    tasks.update('define', rules)
+
+    return component
   }
 
   /**
@@ -69,10 +80,10 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @returns DataStore[] The array of current data.
    */
   const getStoreMap = () => {
-    const current = storeMap.get(STORE_KEY_RULES)
+    const current = tasks.read('store')
 
     if (!Array.isArray(current)) {
-      storeMap.set(STORE_KEY_RULES, [])
+      tasks.create('store', [])
       return []
     }
 
@@ -91,14 +102,11 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
       return []
     }
 
-    storeMap.set(STORE_KEY_RULES, lastModified)
+    tasks.update('store', lastModified)
     await setRulesMap()
 
     return lastModified
   }
-
-  const normalizeToArray = <T>(data: T | T[]): T[] =>
-    Array.isArray(data) ? data : [data]
 
   /**
    * Menambahkan data baru ke komponen tertentu.
@@ -107,34 +115,24 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
    * @param data - Objek data yang akan ditambahkan.
    */
   const add: AddStore = async (data: DbStore): Promise<DbStore> => {
-    try {
-      const store = before()
+    const store = before()
+    const normalized = toArr(data)
+    const prevId = store?.length ?? 0
+    const newData = normalized.map((item, index) => ({
+      id: `${pathId}.${prevId + index + 1}`,
+      ...item,
+    }))
 
-      const normalized = normalizeToArray(data)
+    const filtered = newData.filter(
+      (item) => !store?.some((old: any) => is(old.id, item.id))
+    )
 
-      const prevId = store?.length ?? 0
-      const newData = normalized.map((item, index) => {
-        const nextId = `${pathId}.${prevId + index + 1}`
-        return {
-          id: nextId,
-          ...item,
-        }
-      })
-
-      const filteredData = newData.filter((item) => {
-        return !store.some((oldData: any) => oldData.id === item.id)
-      })
-
-      if (filteredData.length === 0) {
-        logWarning(`No new data added; all entries already exist.`)
-        return []
-      }
-
-      return await next(filteredData)
-    } catch (e) {
-      logWarning(`Failed add data with error : ${(e as Error).message}`)
+    if (filtered.length === 0) {
+      isWarn(`No new data added; all entries already exist.`, filtered)
       return []
     }
+
+    return await next(filtered)
   }
   /**
    * Mengambil data dari komponen, dapat difilter berdasarkan kunci tertentu.
@@ -249,7 +247,7 @@ export const rupaActions = (pathId: string, rules: RulesConfig) => {
     try {
       const store = before()
       if (Array.isArray(store)) {
-        storeMap.clear()
+        tasks.delete('store')
 
         return store
       }

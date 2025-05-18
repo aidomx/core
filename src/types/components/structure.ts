@@ -1,24 +1,21 @@
-import { DbStore } from '../store'
-import { ComponentVariant } from './variant'
-import { HTMLElementType } from './type'
-import type { RuleEvent } from '../events'
+import type { DbStore } from '../store'
+import type { ComponentVariant } from './variant'
+import type { HTMLElementType } from './type'
+import type { EventSources, EventType } from '../events'
+// import type { RuleEvent } from '../events'
 
 export type Design = {
-  type: HTMLElementType
+  type?: HTMLElementType
   className?: string
   variant?: ComponentVariant
-  content?: string
+  content?: any
 }
 
 export type RuleComponent = {
+  id?: string
   name?: string
   data?: DbStore[]
   design?: Design
   scope?: RuleComponent[]
-  sealed?: false | true
-  target?: string
-  listeners?: {
-    [events: string]: (event: RuleEvent) => void
-  }
-  [key: string]: any
+  listeners?: Record<EventType, EventSources>
 }

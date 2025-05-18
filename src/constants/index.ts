@@ -1,2 +1,2 @@
-export * from './cacheKey'
+/** Rules secret key */
 export * from './rulesKey'

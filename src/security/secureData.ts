@@ -1,4 +1,6 @@
-import type { RulesConfig } from '@/types'
+import type { RulesApi } from '@/types'
+
+type RulesConfig = RulesApi.rulesConfig
 
 export function encodeData(data: RulesConfig) {
   try {

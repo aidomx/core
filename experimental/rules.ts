@@ -27,9 +27,9 @@
 //import { GhostRiderEvents } from '@/types'
 
 import { defineConfig } from '@/rules/config'
-import { useRules } from '@/rules/hooks'
-import type { HandlerMap, RuleComponent } from '@/types'
-import * as testHandler from './core/test'
+import { triggerEvent } from '@/_events'
+import { payload } from '@/rules/payload'
+import { RulesApi } from '@/types'
 
 //const rules = defineRules({
 //root: 'container',
@@ -162,6 +162,7 @@ import * as testHandler from './core/test'
 
 // console.log(ghosts)
 
+console.time('rules')
 /**
  * Struktur baru defineRules untuk mendukung fleksibel
  * dalam memisahkan logic dan UI.
@@ -181,7 +182,7 @@ const test = [
       type: 'button',
     },
   },
-] as RuleComponent[]
+] as RulesApi.component[]
 
 const test2 = [
   {
@@ -191,7 +192,7 @@ const test2 = [
       className: '',
     },
   },
-] as RuleComponent[]
+] as RulesApi.component[]
 
 const test3 = [
   {
@@ -201,7 +202,7 @@ const test3 = [
       className: '',
     },
   },
-] as RuleComponent[]
+] as RulesApi.component[]
 
 //settings.define({
 //root: 'container',
@@ -223,23 +224,52 @@ const test3 = [
 
 // Configuration components dengan akses terbatas untuk publik.
 export const app = defineConfig({
-  autoCompile: true,
-  devMode: false,
-  remove: 'test2',
-  clone: 'test3',
-  connect: (rupa) => {
-    rupa('test', async (db) => {
-      await db.add({ name: 'Kaos panjang' })
-    })
-  },
+  //remove: 'test2',
+  //clone: 'test3',
+  //connect: (rupa) => {
+  //rupa('test', async (db) => {
+  //await db.add({ name: 'Kaos panjang' })
+  //})
+  //},
   define: {
     root: 'container',
     components: { test, test2, test3 },
   },
   use: {
     name: 'testHandler',
-    maps: () => testHandler,
+    type: 'click',
+    maps: (e) => {
+      const tick = e?.pick('test3')
+      console.log('Before delete: ', tick)
+      e?.delete(tick ?? {}, 'design')
+      console.log('after delete: ', tick)
+    },
   },
+  //spawn: {
+  //id: 'buttonGroups',
+  //config: {
+  //count: 5,
+  //design: {
+  //type: 'button',
+  //},
+  //randomId: false,
+  //contents: ['one', 'two', 'three', 'four', 'five'],
+  //map(ghost: RulesApi.component, index) {
+  //return {
+  //...ghost,
+  //design: {
+  //...ghost.design,
+  //className: index === 0 ? 'btn-blue-500' : 'btn-green-500',
+  //},
+  //}
+  //},
+  //},
+  //},
+  //sort: {
+  //from: 'test3',
+  //to: 'test2',
+  //},
+  devMode: false,
 })
 
 // devMode bisa menggunakan semua fungsi dari luar termasuk compile
@@ -258,5 +288,29 @@ export const app = defineConfig({
 //console.log(event)
 //},
 //})
+//app.define = {
+//root: 'changed',
+//}
 
-//console.log(hooks)
+//console.log('before: ', app)
+//app.remove = ''
+//app.define = {
+//root: 'changed',
+//components: [],
+//}
+//app.clone = ''
+//app.connect = (rupa) =>
+//rupa('test', async () => {
+//console.log('Connection by rupa')
+//})
+
+//console.log('after: ', app)
+
+triggerEvent({
+  name: 'testHandler',
+  scope: false,
+  event: 'click',
+  payload,
+})
+console.log(app)
+console.timeEnd('rules')

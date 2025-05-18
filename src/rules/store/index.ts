@@ -1,8 +1,9 @@
-import { rulesMap } from '@/_caches'
-import { CACHE_KEY_RULES } from '@/constants/cacheKey'
-import type { GenStore, Rules } from '@/types'
+import { tasks } from '@/_caches'
+import type { GenStore, RulesApi } from '@/types'
 import { logWarning } from '@/utils'
 import { rupa } from './rupa'
+
+type Rules = RulesApi.rules
 
 /**
  * Menghasilkan objek store dasar yang berisi aksi manipulasi store.
@@ -21,14 +22,14 @@ const generateStore = (): GenStore => {
  * @param {Rules} rules - Rules yang diberikan untuk validasi dan inisialisasi.
  * @returns {GenStore} Store hasil generate jika valid, jika tidak, objek kosong.
  */
-export const createStore = (rules: Rules): ReturnType<typeof generateStore> => {
+export const createStore = <T extends GenStore>(rules: Rules): T => {
   const isValidRules = validateRules(rules)
 
   if (!isValidRules) {
-    return {} as GenStore
+    return {} as T
   }
 
-  return generateStore()
+  return generateStore() as T
 }
 
 /**
@@ -39,7 +40,7 @@ export const createStore = (rules: Rules): ReturnType<typeof generateStore> => {
  * @returns {boolean} True jika valid dan cocok, false jika tidak.
  */
 const validateRules = (rules: Rules): boolean => {
-  const isReadyRules = rulesMap.has(CACHE_KEY_RULES)
+  const isReadyRules = tasks.has('define')
 
   if (!isReadyRules) {
     logWarning(
@@ -62,12 +63,10 @@ const validateRules = (rules: Rules): boolean => {
     return false
   }
 
-  const cached = rulesMap.get(CACHE_KEY_RULES)
+  const cached = tasks.read('define')
 
   if (!cached || cached.__aidomx__ !== rules.__aidomx__) {
-    logWarning(
-      '[Store@validateRules] Provided rules do not match the cached rules.'
-    )
+    logWarning('[Store] Provided rules do not match the cached rules.')
     return false
   }
 

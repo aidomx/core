@@ -1,5 +1,4 @@
-import { getRulesMap, rulesMap } from '@/_caches'
-import { CACHE_KEY_RULES } from '@/constants/cacheKey'
+import { tasks } from '@/_caches'
 import type { Rules, VirtualApi } from '@/types'
 import { logWarning } from '@/utils'
 import {
@@ -46,7 +45,7 @@ export const createVirtual = (
 }
 
 const validateRules = (rules: Rules): boolean => {
-  const isReadyRules = rulesMap.has(CACHE_KEY_RULES)
+  const isReadyRules = tasks.has('define')
 
   if (!isReadyRules) {
     logWarning(
@@ -69,12 +68,10 @@ const validateRules = (rules: Rules): boolean => {
     return false
   }
 
-  const cached = getRulesMap()
+  const cached = tasks.read('define')
 
   if (!cached || cached.__aidomx__ !== rules.__aidomx__) {
-    logWarning(
-      '[Virtual@validateRules] Provided rules do not match the cached rules.'
-    )
+    logWarning('[Virtual] Provided rules do not match the cached rules.')
     return false
   }
 
