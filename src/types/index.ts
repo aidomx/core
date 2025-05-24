@@ -33,7 +33,7 @@ type Base = {
   components?: Components
 
   /** Selector root utama, contoh: #app atau body */
-  root: string | string[]
+  root: string
 
   design?: Design
 
@@ -63,6 +63,7 @@ type Base = {
 export namespace RulesApi {
   export type component = RuleComponent
   export type config = Options | Base
+  export type design = Design
   export type event = RuleEvent
   export type eventSource = EventSources
   export type eventType = EventType

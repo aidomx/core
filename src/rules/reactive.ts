@@ -2,6 +2,7 @@ import type { RulesApi } from '@/types'
 import { is, isArr, isFunc, isObj, isWarn, net, toArr } from '@/utils'
 import { getComponents } from './actions'
 import { payload } from './payload'
+import { settings } from './settings'
 
 /**
  * Event Sources
@@ -161,6 +162,7 @@ export const registerReactive = (
       const key = event as EventType
       const fn = (e?: Event) =>
         handler(Object.assign({}, e ?? {}, payload) as ReactiveEvent)
+
       events[key] = fn
     }
   }

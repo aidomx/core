@@ -26,6 +26,7 @@ import { triggerEvent } from '@/_events'
 import { payload } from '@/rules/payload'
 import { RulesApi } from '@/types'
 import { benchmark } from '@/utils/benchmark'
+import { settings } from '@/rules'
 
 benchmark.start('defineConfig')
 /**
@@ -69,7 +70,7 @@ const test3 = [
   },
 ] as RulesApi.component[]
 
-const contents = Array.from({ length: 2 }, (_, i) => i + 1)
+const contents = Array.from({ length: 1000000 }, (_, i) => i + 1)
 
 export const app = defineConfig({
   remove: 'test2',
@@ -96,7 +97,7 @@ export const app = defineConfig({
   spawn: {
     id: 'buttonGroups',
     config: {
-      count: 2,
+      count: 1000000,
       design: {
         type: 'button',
       },
@@ -134,5 +135,7 @@ triggerEvent({
   payload,
 })
 benchmark.end('reactive use')
+
+settings.refresh?.(false)
 
 benchmark.report()

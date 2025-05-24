@@ -8,7 +8,7 @@ export type Design = {
   type?: HTMLElementType
   className?: string
   variant?: ComponentVariant
-  content?: any
+  style?: Record<string, any>
 }
 
 export type RuleComponent = {
@@ -18,4 +18,5 @@ export type RuleComponent = {
   design?: Design
   scope?: RuleComponent[]
   listeners?: Record<EventType, EventSources>
+  content?: any
 }

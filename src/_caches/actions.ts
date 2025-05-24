@@ -13,7 +13,7 @@ const rulesMap: RuleMap = new Map()
 /**
  * List of allowed keys for mutation in `defineState`.
  */
-const keys: Key[] = [
+export const keys: Key[] = [
   'clone',
   'compile',
   'connect',

@@ -2,7 +2,8 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: ['src/index.ts'],
-  format: ['esm'],
+  format: ['esm', 'iife'],
+  globalName: 'Aidomx',
   target: 'es2017',
   outDir: 'dist',
   dts: true,

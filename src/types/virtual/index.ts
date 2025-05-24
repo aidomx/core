@@ -40,8 +40,9 @@ export type SpawnGhostsLayer = (id: string, config: SpawnConfig) => any
 export type CompileLayer = (ghost: GhostElement) => void
 // @PullGhostLayer
 export type PullGhostLayer = (
-  scope: string[]
+  scope: string
 ) => Record<string, RuleComponent | RuleComponent[]>
+
 export type PushGhostLayer = () => RulesConfig
 
 export type SealGhostLayer = (id?: string) => void

@@ -1,4 +1,4 @@
-import type { LayerApi, RulesApi } from '..'
+import type { RulesApi } from '..'
 
 type Component = RulesApi.component
 type RulesConfig = RulesApi.rulesConfig
@@ -24,7 +24,8 @@ export type Options = {
 
 export type Settings = {
   compile?(state?: RulesConfig): void
-  define?(state: Options): boolean
-  push?(): RulesConfig
-  pull?(key: string[]): Record<string, Component | Component[]>
+  define(state: Options): boolean
+  push(): RulesConfig
+  pull(key: string): Record<string, Component | Component[]>
+  refresh(mounted: true | false): boolean
 }

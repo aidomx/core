@@ -1,3 +1,4 @@
+export * from './benchmark'
 export * from './clonePreserve'
 export * from './conditional'
 export * from './deepClone'

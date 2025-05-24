@@ -93,7 +93,7 @@ export const connect: LayerApi.connect = (fn) => {
 }
 
 export const groupByName = (ghosts: Component[]) => {
-  if (isNil(ghosts)) return {}
+  if (!isArr(ghosts)) return ghosts
 
   return aro(ghosts, 'name')
 }
@@ -130,7 +130,7 @@ export const resetGhost: LayerApi.reset = () => {
   return true
 }
 
-export const pullGhost: LayerApi.pull = (scope: string[] = []) => {
+export const pullGhost: LayerApi.pull = (scope: string | string[] = []) => {
   const rules = getRules()
   const components = getComponents()
 
@@ -138,14 +138,16 @@ export const pullGhost: LayerApi.pull = (scope: string[] = []) => {
     isWarn('Invalid rules, please setup properly.', rules)
   }
 
-  if (scope.length > 0) {
+  if (isArr(scope) && scope.length > 0) {
     const filtered = scope.map((name) =>
       components.find((c) => is(c.name, name) || is(c.id, name))
     )
-    return groupByName(filtered.filter(Boolean) as RulesApi.component[])
+    return groupByName(
+      filtered.filter(Boolean) as RulesApi.component[]
+    ) as Record<string, Component | Component[]>
   }
 
-  return groupByName(components)
+  return groupByName(components) as Record<string, Component | Component[]>
 }
 
 export const pushGhost: LayerApi.push = (): RulesConfig => getRules()
