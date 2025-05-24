@@ -14,7 +14,7 @@ All significant changes to this project will be documented here.
 
 ---
 
-## [0.1.6] - May 18, 2025
+## [0.1.6] - May 24, 2025
 
 ### Added
 
