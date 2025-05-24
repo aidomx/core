@@ -13,4 +13,4 @@
 
 ## Cara Penggunaan
 
-Untuk panduan penggunaan yang lebih terstruktur, silakan kunjungi [docs](https://github.com/aidomx/core/blob/dev/docs/README.md).
+Untuk panduan penggunaan yang lebih terstruktur, silakan kunjungi [docs](https://github.com/aidomx/core/blob/main/docs/README.md).

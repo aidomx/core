@@ -21,15 +21,6 @@ npm install @aidomx/core
 ### Contoh Penggunaan
 
 ```ts
-// TestHandler
-import type { RuleEvent } from '@aidomx/core'
-
-export const onClick = (event: RuleEvent) => {
-  alert('Hai Aidomx!!!')
-}
-```
-
-```ts
 import { defineConfig } from '@aidomx/core'
 
 export const rules = defineConfig({
@@ -51,7 +42,7 @@ export const rules = defineConfig({
   },
   use: {
     name: 'refreshButton',
-    maps: [TestHandler],
+    maps: () => alert('Hi aidomx'),
   },
   autoCompile: true,
   devMode: false,
@@ -126,20 +117,6 @@ sort: {
   to: "description"
 }
 ```
-
----
-
-# Roadmap
-
-[x] Rilis awal @aidomx/core
-
-[x] Dukungan createStore, createVirtual, connect
-
-[x] Fungsi spawnGhosts, cloneGhost, sortGhost
-
-[ ] Intregasi vanilla, vite, vue, etc
-
-[ ] Dokumentasi lanjutan dan test coverage
 
 ---
 
