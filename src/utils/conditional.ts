@@ -11,6 +11,32 @@ type MatchBy<T> = Partial<Pick<T, keyof T>>
 
 type ToArr = <T>(source: T | T[] | null | undefined, filter?: Filter) => T[]
 
+type ArrOptions = {
+  from: 'string' | 'object'
+  split?: RegExp
+}
+
+export const Arr = <T extends string | object>(
+  raw: T,
+  options: ArrOptions
+): Array<T | never> => {
+  const { from, split } = options
+
+  if (typeof raw === from && from === 'string') {
+    if (!split) return []
+
+    return raw
+      .toString()
+      .split(split)
+      .map((r) => r.trim())
+      .filter(Boolean) as T[]
+  } else if (from === typeof raw && from === 'object' && !split) {
+    return [raw] as T[]
+  }
+
+  return []
+}
+
 /**
  * Mengubah array menjadi objek dengan key tertentu sebagai index.
  * @example aro([{ id: 1, name: 'A' }], 'id') => { 1: { id: 1, name: 'A' } }
@@ -167,3 +193,14 @@ export const toArr: ToArr = <T>(
 
   return res as T[]
 }
+
+/**
+ * String to Object
+ *
+ * @returns object regular
+ * @ref https://stackoverflow.com/questions/1086404/string-to-object-in-js
+ */
+export const createObj = (origin: string) =>
+  origin.replace(/(\w+:)|(\w+ :)/g, (curr) => {
+    return '"' + curr.substring(0, curr.length - 1) + '":'
+  })
